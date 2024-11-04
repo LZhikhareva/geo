@@ -8,13 +8,28 @@ export class Chat {
     this.latitude = null;
     this.longitude = null;
     this.modal = modal;
+    this.currentMessageText = '';
+
     this.input.addEventListener("keyup", (event) => {
       if (event.code === "Enter") {
         console.log("enter was pressed");
-        this.sendMessage(this.input.value);
+        this.currentMessageText = this.input.value;
+        this.sendMessage(this.currentMessageText);
         this.input.value = "";
       }
     });
+
+    this.modal.ok.addEventListener("click", () => {
+      const coords = this.modal.getCoords(this.modal.input.value);
+      if (coords) {
+        const lat = coords.latitude;
+        const long = coords.longitude;
+        this.modal.hideModal();
+        const message = this.createMessage(this.currentMessageText, lat, long);
+        this.messagesBox.append(message);
+      }
+    });
+
     this.checkGeo();
   }
 
@@ -43,16 +58,6 @@ export class Chat {
       this.messagesBox.append(message);
     } else {
       this.showPopup();
-      this.modal.ok.addEventListener("click", () => {
-        const coords = this.modal.getCoords(this.modal.input.value);
-        if (coords) {
-          const lat = coords.latitude;
-          const long = coords.longitude;
-          this.modal.hideModal();
-          const message = this.createMessage(value, lat, long);
-          this.messagesBox.append(message);
-        }
-      });
     }
   }
 
